@@ -13,17 +13,28 @@
 # limitations under the License.
 
 apiVersion: v1
-kind: PersistentVolume
+kind: Service
 metadata:
-  name: wso2iot-mysql-pv
-  labels:
-    purpose: wso2iot-rdbms-data
+  name: wso2iot-manager-service
 spec:
-  capacity:
-    storage: 20Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  nfs:
-    server: <NFS_SERVER_IP>
-    path: "<NFS_LOCATION_PATH>"
+  # type: NodePort
+  selector:
+    deployment: wso2iot-manager
+  ports:
+    # ports that this service should serve on
+    -
+      name: pass-through-http
+      protocol: TCP
+      port: 8280
+    -
+      name: pass-through-https
+      protocol: TCP
+      port: 8243
+    -
+      name: servlet-http
+      protocol: TCP
+      port: 9763
+    -
+      name: servlet-https
+      protocol: TCP
+      port: 9443

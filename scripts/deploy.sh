@@ -73,28 +73,32 @@ ${KUBECTL} config set-context $(${KUBECTL} config current-context) --namespace=w
 ## create a Kubernetes Secret for passing WSO2 Private Docker Registry credentials
 #${KUBECTL} create secret docker-registry wso2creds --docker-server=docker.wso2.com --docker-username=${WSO2_SUBSCRIPTION_USERNAME} --docker-password=${WSO2_SUBSCRIPTION_PASSWORD} --docker-email=${WSO2_SUBSCRIPTION_USERNAME}
 
-## create Kubernetes Role and Role Binding necessary for the Kubernetes API requests made from Kubernetes membership scheme
-#${KUBECTL} create -f ../../rbac/rbac.yaml
-#
-#echoBold 'Creating Kubernetes ConfigMaps...'
-#${KUBECTL} create configmap integrator-conf --from-file=../confs/
-#${KUBECTL} create configmap integrator-conf-axis2 --from-file=../confs/axis2/
-#${KUBECTL} create configmap integrator-conf-datasources --from-file=../confs/datasources/
+echoBold 'Creating Kubernetes ConfigMaps...'
+${KUBECTL} create configmap iot-manager-conf --from-file=../confs/manager/conf/
+${KUBECTL} create configmap iot-manager-conf-datasources --from-file=../confs/manager/conf/datasources/
+${KUBECTL} create configmap iot-manager-conf-etc --from-file=../confs/manager/conf/etc/
+${KUBECTL} create configmap iot-worker-conf --from-file=../confs/worker/conf/
+${KUBECTL} create configmap iot-worker-conf-datasources --from-file=../confs/worker/conf/datasources/
+${KUBECTL} create configmap iot-worker-conf-etc --from-file=../confs/worker/conf/etc/
+${KUBECTL} create configmap iot-worker-conf-devicetypes --from-file=../confs/worker/repository/deployment/server/devicetypes/
 
 # create MySQL initialization script ConfigMap
 ${KUBECTL} create configmap mysql-dbscripts --from-file=../extras/confs/rdbms/mysql/dbscripts/
 
-#echoBold 'Creating Kubernetes Services...'
-#${KUBECTL} create -f ../integrator-service.yaml
-#${KUBECTL} create -f ../integrator-gateway-service.yaml
-#
+echoBold 'Creating Kubernetes Services...'
+${KUBECTL} create -f ../iot/manager/wso2iot-manager-service.yaml
+${KUBECTL} create -f ../iot/worker/wso2iot-worker-service.yaml
+
 #echoBold 'Creating Kubernetes Ingresses...'
 #${KUBECTL} create -f ../ingresses/integrator-gateway-ingress.yaml
 #${KUBECTL} create -f ../ingresses/integrator-ingress.yaml
 
 echoBold 'Deploying Kubernetes Persistent Volumes...'
-#${KUBECTL} create -f ../volumes/persistent-volumes.yaml
+${KUBECTL} create -f ../volumes/persistent-volumes.yaml
 ${KUBECTL} create -f ../extras/rdbms/volumes/persistent-volumes.yaml
+
+echoBold 'Creating Kubernetes Persistent Volume Claims...'
+${KUBECTL} create -f ../iot/wso2iot-volume-claim.yaml
 
 # MySQL
 echoBold 'Deploying the databases...'
@@ -103,8 +107,9 @@ ${KUBECTL} create -f ../extras/rdbms/mysql/mysql-deployment.yaml
 ${KUBECTL} create -f ../extras/rdbms/mysql/mysql-service.yaml
 sleep 30s
 
-#echoBold 'Creating the Kubernetes Deployment...'
-#${KUBECTL} create -f ../integrator-volume-claim.yaml
-#${KUBECTL} create -f ../integrator-deployment.yaml
+echoBold 'Creating the Kubernetes Deployment...'
+${KUBECTL} create -f ../iot/manager/wso2iot-manager-deployment.yaml
+sleep 240s
+${KUBECTL} create -f ../iot/worker/wso2iot-worker-deployment.yaml
 
 echoBold 'Finished'

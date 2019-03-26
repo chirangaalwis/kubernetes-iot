@@ -1,0 +1,105 @@
+# Copyright (c) 2019, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wso2iot-scalable-worker-deployment
+spec:
+  selector:
+    matchLabels:
+      deployment: wso2iot-worker
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        deployment: wso2iot-worker
+    spec:
+      containers:
+      - name: wso2iot-worker
+        image: docker.wso2.com/wso2iot-server:3.3.1
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - nc -z localhost 9443
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - nc -z localhost 9443
+          initialDelaySeconds: 240
+          failureThreshold: 3
+          periodSeconds: 10
+        lifecycle:
+          preStop:
+            exec:
+              command:  ['sh', '-c', '${WSO2_SERVER_HOME}/bin/iot-server.sh stop']
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 4000m
+          limits:
+            memory: 4Gi
+            cpu: 4000m
+        securityContext:
+          runAsUser: 802
+        ports:
+        -
+          containerPort: 9763
+          protocol: "TCP"
+        -
+          containerPort: 9443
+          protocol: "TCP"
+        volumeMounts:
+        - name: iot-storage-volume
+          mountPath: /home/wso2carbon/wso2iot-3.3.1/repository/deployment/server
+        - name: iot-worker-conf
+          mountPath: /home/wso2carbon/wso2-config-volume/conf
+        - name: iot-worker-conf-datasources
+          mountPath: /home/wso2carbon/wso2-config-volume/conf/datasources
+        - name: iot-worker-conf-etc
+          mountPath: /home/wso2carbon/wso2-config-volume/conf/etc
+        - name: iot-worker-conf-devicetypes
+          mountPath: /home/wso2carbon/wso2-config-volume/repository/deployment/server/devicetypes
+      serviceAccountName: "wso2svc-account"
+#      imagePullSecrets:
+#      - name: wso2creds
+      volumes:
+      - name: iot-storage-volume
+        persistentVolumeClaim:
+          claimName: wso2iot-shared-artifacts-pvc
+      - name: iot-worker-conf
+        configMap:
+          name: iot-worker-conf
+      - name: iot-worker-conf-datasources
+        configMap:
+          name: iot-worker-conf-datasources
+      - name: iot-worker-conf-etc
+        configMap:
+          name: iot-worker-conf-etc
+      - name: iot-worker-conf-devicetypes
+        configMap:
+          name: iot-worker-conf-devicetypes

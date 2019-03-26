@@ -15,14 +15,14 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: wso2iot-mysql-pv
+  name: wso2iot-shared-artifacts-pv
   labels:
-    purpose: wso2iot-rdbms-data
+    purpose: wso2iot-shared-artifacts
 spec:
   capacity:
-    storage: 20Gi
+    storage: 1Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   nfs:
     server: <NFS_SERVER_IP>

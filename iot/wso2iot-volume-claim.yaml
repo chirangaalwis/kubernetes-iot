@@ -13,17 +13,16 @@
 # limitations under the License.
 
 apiVersion: v1
-kind: PersistentVolume
+kind: PersistentVolumeClaim
 metadata:
-  name: wso2iot-mysql-pv
-  labels:
-    purpose: wso2iot-rdbms-data
+  name: wso2iot-shared-artifacts-pvc
 spec:
-  capacity:
-    storage: 20Gi
   accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  nfs:
-    server: <NFS_SERVER_IP>
-    path: "<NFS_LOCATION_PATH>"
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ""
+  selector:
+    matchLabels:
+      purpose: wso2iot-shared-artifacts
