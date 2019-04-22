@@ -48,7 +48,7 @@
 	   services deployed on this server instance.
 	-->
 
-	<HostName>iot.wso2.com</HostName>
+	<HostName>gateway.iot.wso2.com</HostName>
 
 	<!--
 	Host name to be used for the Carbon management console

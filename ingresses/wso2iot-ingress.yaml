@@ -12,20 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: Service
+apiVersion: extensions/v1beta1
+kind: Ingress
 metadata:
-  name: wso2iot-worker-service
+  name: wso2iot-manager-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.org/ssl-services: "wso2iot-manager-service"
+    nginx.org/location-snippets: |
+        proxy_set_header proxy-mutual-auth-header $ssl_client_s_dn_legacy;
 spec:
-  selector:
-    deployment: wso2iot-worker
-  ports:
-    # ports that this service should serve on
-    -
-      name: pass-through-http
-      protocol: TCP
-      port: 8280
-    -
-      name: pass-through-https
-      protocol: TCP
-      port: 8243
+  tls:
+  - hosts:
+    - iot.wso2.com
+    secretName: iots-secret
+  rules:
+  - host: iot.wso2.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: wso2iot-manager-service
+          servicePort: 9443

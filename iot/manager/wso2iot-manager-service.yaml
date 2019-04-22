@@ -17,19 +17,10 @@ kind: Service
 metadata:
   name: wso2iot-manager-service
 spec:
-  # type: NodePort
   selector:
     deployment: wso2iot-manager
   ports:
     # ports that this service should serve on
-    -
-      name: pass-through-http
-      protocol: TCP
-      port: 8280
-    -
-      name: pass-through-https
-      protocol: TCP
-      port: 8243
     -
       name: servlet-http
       protocol: TCP

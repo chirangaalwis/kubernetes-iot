@@ -53,7 +53,7 @@
     </KeyManagerConfiguration>
     <PolicyConfiguration>
         <MonitoringClass>org.wso2.carbon.policy.mgt</MonitoringClass>
-        <MonitoringEnable>true</MonitoringEnable>
+        <MonitoringEnable>false</MonitoringEnable>
         <MonitoringFrequency>60000</MonitoringFrequency>
         <MaxRetries>5</MaxRetries>
         <MinRetriesToMarkUnreachable>8</MinRetriesToMarkUnreachable>
@@ -139,7 +139,7 @@
     </OperationAnalyticsConfiguration>
     <!--This configuration used to configure the options for remote device control feature -->
     <RemoteSessionConfiguration>
-        <Enabled>true</Enabled>
+        <Enabled>false</Enabled>
         <RemoteSessionServerUrl>ws://localhost:9763</RemoteSessionServerUrl>
         <MaximumHTTPConnectionPerHost>2</MaximumHTTPConnectionPerHost>
         <MaximumTotalHTTPConnections>100</MaximumTotalHTTPConnections>
