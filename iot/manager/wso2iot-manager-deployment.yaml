@@ -74,8 +74,8 @@ spec:
           containerPort: 9443
           protocol: "TCP"
         volumeMounts:
-#        - name: iot-storage-volume
-#          mountPath: /home/wso2carbon/wso2iot-3.3.1/repository/deployment/server
+        - name: iot-storage-volume
+          mountPath: /home/wso2carbon/wso2iot-3.3.1/repository/deployment/server
         - name: iot-manager-conf
           mountPath: /home/wso2carbon/wso2-config-volume/conf
         - name: iot-manager-conf-datasources
@@ -98,9 +98,9 @@ spec:
 #      imagePullSecrets:
 #      - name: wso2creds
       volumes:
-#      - name: iot-storage-volume
-#        persistentVolumeClaim:
-#          claimName: wso2iot-shared-artifacts-pvc
+      - name: iot-storage-volume
+        persistentVolumeClaim:
+          claimName: wso2iot-shared-artifacts-pvc
       - name: iot-manager-conf
         configMap:
           name: iot-manager-conf

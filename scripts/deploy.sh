@@ -119,7 +119,7 @@ sleep 30s
 echoBold 'Creating the Kubernetes Deployment...'
 ${KUBECTL} create -f ../iot/manager/wso2iot-manager-deployment.yaml
 ${KUBECTL} create -f ../iot/manager/wso2iot-manager-service.yaml
-sleep 120s
+sleep 300s
 ${KUBECTL} create -f ../iot/worker/wso2iot-worker-deployment.yaml
 ${KUBECTL} create -f ../iot/worker/wso2iot-worker-service.yaml
 ${KUBECTL} create -f ../iot/worker/wso2iot-worker-migration-service.yaml
