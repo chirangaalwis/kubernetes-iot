@@ -130,7 +130,6 @@ kubectl create -f <KUBERNETES_HOME>/volumes/persistent-volumes.yaml
 ##### 5. Create Kubernetes ConfigMaps for passing WSO2 product configurations into the Kubernetes cluster.
 
 ```
-
 kubectl create configmap iot-manager-conf --from-file=confs/manager/conf/
 kubectl create configmap iot-manager-conf-datasources --from-file=confs/manager/conf/datasources/
 kubectl create configmap iot-manager-conf-etc --from-file=confs/manager/conf/etc/
@@ -146,28 +145,57 @@ kubectl create configmap iot-worker-conf-datasources --from-file=confs/worker/co
 kubectl create configmap iot-worker-conf-etc --from-file=confs/worker/conf/etc/
 kubectl create configmap iot-worker-conf-identity --from-file=confs/worker/conf/identity/
 kubectl create configmap iot-worker-conf-devicetypes --from-file=confs/worker/repository/deployment/server/devicetypes/
-kubectl create configmap iot-worker-conf-api-store --from-file=confs/worker/repository/deployment/server/jaggeryapps/api-store/site/conf/
-kubectl create configmap iot-worker-conf-devicemgt --from-file=confs/worker/repository/deployment/server/jaggeryapps/devicemgt/app/conf/
-kubectl create configmap iot-worker-conf-portal --from-file=confs/worker/repository/deployment/server/jaggeryapps/portal/configs/
-kubectl create configmap iot-worker-conf-publisher --from-file=confs/worker/repository/deployment/server/jaggeryapps/publisher/config/
-kubectl create configmap iot-worker-conf-store --from-file=confs/worker/repository/deployment/server/jaggeryapps/store/config/
 
 ```
 
-##### 8. Create Kubernetes Services and Deployments for WSO2 IoT Server.
+##### 8. Create Kubernetes Services for WSO2 IoT Server Manager and Worker.
+
+```
+kubectl create -f ../iot/manager/wso2iot-manager-service.yaml
+kubectl create -f ../iot/worker/wso2iot-worker-service.yaml
+kubectl create -f ../iot/worker/wso2iot-worker-devices-service.yaml
+kubectl create -f ../iot/worker/wso2iot-worker-device-admin-service.yaml
+kubectl create -f ../iot/worker/wso2iot-worker-configuration-service.yaml
+
+```
+
+##### 9. Create Kubernetes Deployment for WSO2 IoT Server Manager.
+
+In this step, the WSO2 IoT Server Manager Kubernetes Pod is deployed. It is a **must** to perform the Manager deployment
+and ensure its success prior to the Worker deployment.
+
+Create the Kubernetes Deployment for WSO2 IoT Server Manager.
 
 ```
 kubectl create -f <KUBERNETES_HOME>/iot/manager/wso2iot-manager-deployment.yaml
-kubectl create -f <KUBERNETES_HOME>/iot/worker/wso2iot-worker-deployment.yaml
-kubectl create -f <KUBERNETES_HOME>/iot/wso2iot-service.yaml
+
 ```
 
-##### 9. Deploy Kubernetes Ingress resources.
+You can ensure the successful deployment by listing the Pods using `kubectl get pods`. The following is a sample output
+received after a successful deployment, once the Pods are listed.
 
-The WSO2 IoT Server Kubernetes Ingress resources use the NGINX Ingress Controller.
+```
+NAME                                                  READY     STATUS    RESTARTS   AGE
+wso2iot-manager-deployment-<xxxxxxxxxxxxxx>           1/1       Running   0          5m
+
+```
+
+The `READY` column indicates whether the WSO2 IoT Server Manager Kubernetes Pod is ready (`1/1`) or not ready (`0/1`) to serve incoming requests.
+
+
+##### 10. Create Kubernetes Deployment for WSO2 IoT Server Worker.
+
+```
+kubectl create -f <KUBERNETES_HOME>/iot/worker/wso2iot-worker-deployment.yaml
+
+```
+
+##### 11. Deploy Kubernetes Ingress resources.
+
+The WSO2 IoT Server Kubernetes Ingress resources use the [NGINX Ingress Controller](https://github.com/nginxinc/kubernetes-ingress) (maintained by NGINX).
 
 In order to enable the NGINX Ingress controller in the desired cloud or on-premise environment,
-please refer the official documentation, [NGINX Ingress Controller Installation Guide](https://kubernetes.github.io/ingress-nginx/deploy/).
+please refer the official documentation, [NGINX Ingress Controller Installation Guide](https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md).
 
 Finally, deploy the WSO2 IoT Server Kubernetes Ingress resources as follows:
 
@@ -176,41 +204,55 @@ kubectl create -f <KUBERNETES_HOME>/ingresses/wso2iot-gateway-ingress.yaml
 kubectl create -f <KUBERNETES_HOME>/ingresses/wso2iot-ingress.yaml
 ```
 
-##### 10. Access Management Consoles.
+##### 12. Access Management Consoles.
 
-Default deployment will expose `wso2apim` and `wso2apim-gateway hosts.
+Ingress resource deployment will expose the following host names, by default.
 
-To access the console in the environment,
+- For management user interfaces: `iot.wso2.com`
+- For gateway: `gateway.iot.wso2.com`
 
-a. Obtain the external IP (`EXTERNAL-IP`) of the Ingress resources by listing down the Kubernetes Ingresses.
+To access the management user interfaces and gateway service in the environment,
 
-  ```
-  kubectl get ing
-  ```
+a. Obtain the external Ingress IP `<INGRESS-IP>` of the Ingress resources.
+
+For this you need to obtain the `EXTERNAL-IP` of the Kubernetes Service exposing the NGINX Ingress Controller to outside
+of the Kubernetes cluster.
+
+In an AWS environment, the corresponding `EXTERNAL-IP` will be a Classic Load Balancer (ELB) domain name.
 
 e.g.
 
 ```
-NAME                                             HOSTS                       ADDRESS         PORTS     AGE
-wso2apim-with-analytics-apim-ingress             wso2apim,wso2apim-gateway   <EXTERNAL-IP>   80, 443   7m
+NAME            TYPE           CLUSTER-IP      EXTERNAL-IP             PORT(S)                      AGE       SELECTOR
+nginx-ingress   LoadBalancer   10.100.116.65   <AWS-ELB-DOMAIN-NAME>   80:31387/TCP,443:31530/TCP   50m       app=nginx-ingress
 ```
 
-b. Add the above host as an entry in /etc/hosts file as follows:
+Do a `nslookup` for the domain name displayed under the `EXTERNAL-IP` column to find out IP of the exposed ingress resource.
+
+b. Add entries for above hosts in `/etc/hosts` file as follows:
 
   ```
-  <EXTERNAL-IP>	wso2apim
-  <EXTERNAL-IP>	wso2apim-gateway
+  <INGRESS-IP> iot.wso2.com
+  <INGRESS-IP> gateway.iot.wso2.com
   ```
 
-c. Try navigating to `https://wso2apim/carbon` from your favorite browser.
+c. Try navigating to the following management user interfaces.
 
-##### 11. Scale up using `kubectl scale`.
+- Carbon Management Console: `https://iot.wso2.com/carbon`
 
-Default deployment runs a single replica (or pod) of WSO2 API Manager. To scale this deployment into any `<n>` number of
+- Device Management Console: `https://iot.wso2.com/devicemgt`
+
+- Publisher: `https://iot.wso2.com/publisher`
+
+- Store: `https://iot.wso2.com/store`
+
+##### 13. Scale up using worker nodes using `kubectl scale`.
+
+Default deployment runs a single replica (or pod) of WSO2 IoT Server Worker. To scale this deployment into any `<n>` number of
 container replicas, upon your requirement, simply run following Kubernetes client command on the terminal.
 
 ```
-kubectl scale --replicas=<n> -f <KUBERNETES_HOME>/pattern-1/apim/wso2apim-deployment.yaml
+kubectl scale --replicas=<n> -f <KUBERNETES_HOME>/iot/worker/wso2iot-worker-deployment.yaml
 ```
 
 For example, If `<n>` is 2, you are here scaling up this deployment from 1 to 2 container replicas.

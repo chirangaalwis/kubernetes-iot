@@ -15,7 +15,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wso2iot-worker-migration-service
+  name: wso2iot-worker-configuration-service
 spec:
   selector:
     deployment: wso2iot-worker

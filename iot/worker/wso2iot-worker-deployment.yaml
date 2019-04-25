@@ -86,16 +86,6 @@ spec:
           mountPath: /home/wso2carbon/wso2-config-volume/conf/identity
         - name: iot-worker-conf-devicetypes
           mountPath: /home/wso2carbon/wso2-config-volume/repository/deployment/server/devicetypes
-        - name: iot-worker-conf-api-store
-          mountPath: /home/wso2carbon/wso2-config-volume/repository/deployment/server/jaggeryapps/api-store/site/conf
-        - name: iot-worker-conf-devicemgt
-          mountPath: /home/wso2carbon/wso2-config-volume/repository/deployment/server/jaggeryapps/devicemgt/app/conf
-        - name: iot-worker-conf-portal
-          mountPath: /home/wso2carbon/wso2-config-volume/repository/deployment/server/jaggeryapps/portal/configs
-        - name: iot-worker-conf-publisher
-          mountPath: /home/wso2carbon/wso2-config-volume/repository/deployment/server/jaggeryapps/publisher/config
-        - name: iot-worker-conf-store
-          mountPath: /home/wso2carbon/wso2-config-volume/repository/deployment/server/jaggeryapps/store/config
       serviceAccountName: "wso2svc-account"
 #      imagePullSecrets:
 #      - name: wso2creds
@@ -118,18 +108,3 @@ spec:
       - name: iot-worker-conf-devicetypes
         configMap:
           name: iot-worker-conf-devicetypes
-      - name: iot-worker-conf-api-store
-        configMap:
-          name: iot-worker-conf-api-store
-      - name: iot-worker-conf-devicemgt
-        configMap:
-          name: iot-worker-conf-devicemgt
-      - name: iot-worker-conf-portal
-        configMap:
-          name: iot-worker-conf-portal
-      - name: iot-worker-conf-publisher
-        configMap:
-          name: iot-worker-conf-publisher
-      - name: iot-worker-conf-store
-        configMap:
-          name: iot-worker-conf-store

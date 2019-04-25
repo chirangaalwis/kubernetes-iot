@@ -89,11 +89,6 @@ ${KUBECTL} create configmap iot-worker-conf-datasources --from-file=../confs/wor
 ${KUBECTL} create configmap iot-worker-conf-etc --from-file=../confs/worker/conf/etc/
 ${KUBECTL} create configmap iot-worker-conf-identity --from-file=../confs/worker/conf/identity/
 ${KUBECTL} create configmap iot-worker-conf-devicetypes --from-file=../confs/worker/repository/deployment/server/devicetypes/
-${KUBECTL} create configmap iot-worker-conf-api-store --from-file=../confs/worker/repository/deployment/server/jaggeryapps/api-store/site/conf/
-${KUBECTL} create configmap iot-worker-conf-devicemgt --from-file=../confs/worker/repository/deployment/server/jaggeryapps/devicemgt/app/conf/
-${KUBECTL} create configmap iot-worker-conf-portal --from-file=../confs/worker/repository/deployment/server/jaggeryapps/portal/configs/
-${KUBECTL} create configmap iot-worker-conf-publisher --from-file=../confs/worker/repository/deployment/server/jaggeryapps/publisher/config/
-${KUBECTL} create configmap iot-worker-conf-store --from-file=../confs/worker/repository/deployment/server/jaggeryapps/store/config/
 
 # create MySQL initialization script ConfigMap
 ${KUBECTL} create configmap mysql-dbscripts --from-file=../extras/confs/rdbms/mysql/dbscripts/
@@ -122,7 +117,9 @@ ${KUBECTL} create -f ../iot/manager/wso2iot-manager-service.yaml
 sleep 300s
 ${KUBECTL} create -f ../iot/worker/wso2iot-worker-deployment.yaml
 ${KUBECTL} create -f ../iot/worker/wso2iot-worker-service.yaml
-${KUBECTL} create -f ../iot/worker/wso2iot-worker-migration-service.yaml
+${KUBECTL} create -f ../iot/worker/wso2iot-worker-devices-service.yaml
+${KUBECTL} create -f ../iot/worker/wso2iot-worker-device-admin-service.yaml
+${KUBECTL} create -f ../iot/worker/wso2iot-worker-configuration-service.yaml
 sleep 240s
 
 echoBold 'Finished'

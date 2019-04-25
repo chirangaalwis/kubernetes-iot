@@ -18,10 +18,10 @@ metadata:
   name: wso2iot-gateway-ingress
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    nginx.org/ssl-services: "wso2iot-worker-migration-service,wso2iot-worker-service"
+    nginx.org/ssl-services: "wso2iot-worker-service,wso2iot-worker-device-service,wso2iot-worker-device-admin-service,wso2iot-worker-configuration-service"
     nginx.org/location-snippets: |
         proxy_set_header proxy-mutual-auth-header $ssl_client_s_dn_legacy;
-    nginx.org/rewrites: "serviceName=wso2iot-worker-migration-service rewrite=/api/device-mgt/android/v0.9"
+    nginx.org/rewrites: "serviceName=wso2iot-worker-device-service rewrite=/api/device-mgt/android/v0.9/devices/0.9.0;serviceName=wso2iot-worker-device-admin-service rewrite=/api/device-mgt/android/v0.9/admin/devices/0.9.0;serviceName=wso2iot-worker-configuration-service rewrite=/api/device-mgt/android/v0.9/configuration/0.9.0"
 spec:
   tls:
   - hosts:
@@ -35,7 +35,15 @@ spec:
         backend:
           serviceName: wso2iot-worker-service
           servicePort: 8243
-      - path: /api/device-mgt/android/v1.0
+      - path: /api/device-mgt/android/v1.0/devices
         backend:
-          serviceName: wso2iot-worker-migration-service
+          serviceName: wso2iot-worker-device-service
+          servicePort: 8243
+      - path: /api/device-mgt/android/v1.0/admin/devices
+        backend:
+          serviceName: wso2iot-worker-device-admin-service
+          servicePort: 8243
+      - path: /api/device-mgt/android/v1.0/configuration
+        backend:
+          serviceName: wso2iot-worker-configuration-service
           servicePort: 8243

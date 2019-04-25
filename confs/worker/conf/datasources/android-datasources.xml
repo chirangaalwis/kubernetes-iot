@@ -30,7 +30,7 @@
 			</jndiConfig>
 			<definition type="RDBMS">
 				<configuration>
-					<url>jdbc:mysql://wso2iot-rdbms-service:3306/prod_wso2_appm_db?autoReconnect=true&amp;relaxAutoCommit=true&amp;useSSL=false</url>
+					<url>jdbc:mysql://wso2iot-rdbms-service:3306/prod_wso2_cdm_db?autoReconnect=true&amp;relaxAutoCommit=true&amp;useSSL=false</url>
 					<username>wso2carbon</username>
 					<password>wso2carbon</password>
 					<driverClassName>com.mysql.jdbc.Driver</driverClassName>

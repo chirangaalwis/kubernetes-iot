@@ -36,10 +36,10 @@ git clone https://github.com/wso2/kubernetes-iot.git
 
 ##### 2. Deploy Kubernetes Ingress controller.
 
-The Kubernetes Ingress resources of this Kubernetes deployment use the NGINX Ingress Controller..
+The WSO2 IoT Server Kubernetes Ingress resources use the [NGINX Ingress Controller](https://github.com/nginxinc/kubernetes-ingress) (maintained by NGINX).
 
 In order to enable the NGINX Ingress controller in the desired cloud or on-premise environment,
-please refer the official documentation, [NGINX Ingress Controller Installation Guide](https://kubernetes.github.io/ingress-nginx/deploy/).
+please refer the official documentation, [NGINX Ingress Controller Installation Guide](https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md).
 
 ##### 3. Setup a Network File System (NFS) to be used for persistent storage.
 
@@ -106,40 +106,55 @@ Change directory to `<KUBERNETES_HOME>/scripts` and execute the `deploy.sh` shel
 
 >To un-deploy, be on the same directory and execute the `undeploy.sh` shell script on the terminal.
 
-##### 7. Access Management Consoles.
+##### 6. Access Management Consoles.
 
-Default deployment will expose `altus.apim.com`, `altus.gateway.com`, `altus.internal.gateway.com` and `apim.dev.mycompany.com` hosts.
+Ingress resource deployment will expose the following host names, by default.
 
-To access the console in the environment,
+- For management user interfaces: `iot.wso2.com`
+- For gateway: `gateway.iot.wso2.com`
 
-a. Obtain the external IP (`EXTERNAL-IP`) of the Ingress resources by listing down the Kubernetes Ingresses.
+To access the management user interfaces and gateway service in the environment,
 
-  ```
-  kubectl get ing
-  ```
+a. Obtain the external Ingress IP `<INGRESS-IP>` of the Ingress resources.
+
+For this you need to obtain the `EXTERNAL-IP` of the Kubernetes Service exposing the NGINX Ingress Controller to outside
+of the Kubernetes cluster.
+
+In an AWS environment, the corresponding `EXTERNAL-IP` will be a Classic Load Balancer (ELB) domain name.
 
 e.g.
 
 ```
-NAME                                             HOSTS                       ADDRESS         PORTS     AGE
-wso2apim-external-gateway-ingress                altus.gateway.com           <EXTERNAL-IP>   80, 443   7m
-wso2apim-ingress                                 altus.apim.com              <EXTERNAL-IP>   80, 443   7m
-wso2apim-internal-gateway-ingress                altus.internal.gateway.com  <EXTERNAL-IP>   80, 443   7m
-wso2apim-is-as-km-ingress                        apim.dev.mycompany.com      <EXTERNAL-IP>   80, 443   7m
+NAME            TYPE           CLUSTER-IP      EXTERNAL-IP             PORT(S)                      AGE       SELECTOR
+nginx-ingress   LoadBalancer   10.100.116.65   <AWS-ELB-DOMAIN-NAME>   80:31387/TCP,443:31530/TCP   50m       app=nginx-ingress
 ```
 
-b. Add the above host as an entry in /etc/hosts file as follows:
+Do a `nslookup` for the domain name displayed under the `EXTERNAL-IP` column to find out IP of the exposed ingress resource.
+
+b. Add entries for above hosts in `/etc/hosts` file as follows:
 
   ```
-  <EXTERNAL-IP>	altus.gateway.com
-  <EXTERNAL-IP>	altus.apim.com
-  <EXTERNAL-IP>	apim.dev.mycompany.com
+  <INGRESS-IP> iot.wso2.com
+  <INGRESS-IP> gateway.iot.wso2.com
   ```
 
-c. Try navigating to management consoles from your favorite browser.
+c. Try navigating to the following management user interfaces.
 
-- WSO2 API Manager Management Console: `https://altus.apim.com/carbon`
+- Carbon Management Console: `https://iot.wso2.com/carbon`
 
-- WSO2 API Manager Publisher: `https://altus.apim.com/publisher`
+- Device Management Console: `https://iot.wso2.com/devicemgt`
 
-- WSO2 API Manager Store: `https://altus.apim.com/store`
+- Publisher: `https://iot.wso2.com/publisher`
+
+- Store: `https://iot.wso2.com/store`
+
+##### 7. Scale up using worker nodes using `kubectl scale`.
+
+Default deployment runs a single replica (or pod) of WSO2 IoT Server Worker. To scale this deployment into any `<n>` number of
+container replicas, upon your requirement, simply run following Kubernetes client command on the terminal.
+
+```
+kubectl scale --replicas=<n> -f <KUBERNETES_HOME>/iot/worker/wso2iot-worker-deployment.yaml
+```
+
+For example, If `<n>` is 2, you are here scaling up this deployment from 1 to 2 container replicas.
